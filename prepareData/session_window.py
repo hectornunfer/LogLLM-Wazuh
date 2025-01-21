@@ -5,9 +5,9 @@ from collections import defaultdict
 import pandas as pd
 from tqdm import tqdm
 
-from prepareData.helper import structure_log
+from helper import structure_log
 
-data_dir = r'/content/Data/HDFS_v1'
+data_dir = r'/content/HDFS_v1'
 log_name = "HDFS.log"
 
 output_dir = data_dir
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     data_df = pd.DataFrame(list(data_dict_content.items()), columns=['BlockId', 'Content'])
 
     blk_label_dict = {}
-    blk_label_file = os.path.join(data_dir, "anomaly_label.csv")
+    blk_label_file = os.path.join(data_dir, "preprocessed/anomaly_label.csv")
     blk_df = pd.read_csv(blk_label_file)
     for _, row in tqdm(blk_df.iterrows(),total=len(blk_df)):
         blk_label_dict[row["BlockId"]] = 1 if row["Label"] == "Anomaly" else 0

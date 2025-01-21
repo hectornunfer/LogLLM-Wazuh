@@ -8,8 +8,8 @@ from helper import sliding_window, fixedSize_window, structure_log
 #### for Thunderbird, Liberty, BGL
 
 
-data_dir = r'/mnt/public/gw/SyslogData/BGL'
-log_name = "BGL.log"
+data_dir = r'/content/HDFS_v1'
+log_name = "HDFS_v1.log"
 
 start_line = 0
 end_line = None

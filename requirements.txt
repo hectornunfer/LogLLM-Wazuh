@@ -7,5 +7,5 @@ pathlib
 torch
 peft
 transformers
-sklearn
 bitsandbytes
+scikit-learn

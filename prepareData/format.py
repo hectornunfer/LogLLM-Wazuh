@@ -9,7 +9,7 @@ from helper import sliding_window, fixedSize_window, structure_log
 
 
 data_dir = r'/content/Thunderbird'
-log_name = "Thunderbird.log"
+log_name = "thunderbird_prueba.log"
 
 start_line = 0
 end_line = None

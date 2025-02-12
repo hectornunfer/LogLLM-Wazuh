@@ -38,7 +38,7 @@ if __name__ == '__main__':
     # Archivo para guardar los resultados
     results_file = os.path.join(output_dir, 'metrics_results.csv')
     with open(results_file, 'w') as f:
-        f.write("window_size,step_size,precision,recall,f1\n")
+        f.write("window_size,step_size,precision,recall,f1,acc\n")
 
     if 'thunderbird' in log_name.lower() or 'spirit' in log_name.lower() or 'liberty' in log_name.lower():
         log_format = '<Label> <Id> <Date> <Admin> <Month> <Day> <Time> <AdminAddr> <Content>'   #thunderbird  , spirit, liberty
@@ -143,4 +143,4 @@ if __name__ == '__main__':
 
         # Guardar las métricas en el archivo
         with open(results_file, 'a') as f:
-            f.write(f"{window_size},{step_size},{precision},{recall},{f}\n")
+            f.write(f"{window_size},{step_size},{precision},{recall},{f}, {acc}\n")

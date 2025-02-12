@@ -23,7 +23,7 @@ class CustomDataset(Dataset):
         # contents = df['EventTemplate'].values
         self.sequences = np.array([content.split(' ;-; ') for content in contents], dtype=object)
         self.labels = df['Label'].values
-
+        self.wazids = df['WazId'].values
         self.num_normal = (self.labels == 0).sum()
         self.num_anomalous = (self.labels == 1).sum()
 
@@ -46,11 +46,15 @@ class CustomDataset(Dataset):
 
     def get_batch(self, indexes):
         this_batch_seqs = self.sequences[indexes]
+        this_wazuh_ids = self.wazids[indexes]
         temp =  self.labels[indexes]
         this_batch_labels = temp.astype(object)
         this_batch_labels[temp == 0] = 'normal'
         this_batch_labels[temp == 1] = 'anomalous'
-        return this_batch_seqs, this_batch_labels
+        return this_batch_seqs, this_batch_labels, this_wazuh_ids
 
     def get_label(self):
         return self.labels
+    
+    def get_wazids(self):
+        return self.wazids

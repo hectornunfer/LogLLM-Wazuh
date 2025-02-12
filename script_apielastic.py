@@ -62,7 +62,7 @@ if response.status_code == 200:
     # Guardar los full_log en Thunderbird.log
     with open("Thunderbird.log", "w", encoding="utf-8") as log_file:
         for alerta in alertas:
-            log_file.write(alerta["id"] + ", " + alerta["full_log"] + "\n")
+            log_file.write(alerta["id"] + " " + alerta["full_log"] + "\n")
 
     # Seguir obteniendo datos mientras haya más resultados
     while len(results["hits"]["hits"]) > 0:
@@ -90,7 +90,7 @@ if response.status_code == 200:
             # Guardar los nuevos full_log en Thunderbird.log
             with open("Thunderbird.log", "a", encoding="utf-8") as log_file:
                 for alerta in new_alertas:
-                    log_file.write(alerta["id"] + ", " + alerta["full_log"] + "\n")
+                    log_file.write(alerta["id"] + " " + alerta["full_log"] + "\n")
         else:
             break
 

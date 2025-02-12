@@ -14,6 +14,16 @@ def fixedSize_window(raw_data, window_size, step_size):
     ]
     return pd.DataFrame(aggregated, columns=list(raw_data.columns)+['item_Label'])
 
+def fixedSize_window_custom(raw_data, window_size, step_size):
+    aggregated = [
+        [raw_data['Content'].iloc[i:i + window_size].values,
+        max(raw_data['Label'].iloc[i:i + window_size]),
+        raw_data['WazId'].iloc[i:i + window_size].values.tolist(),
+        raw_data['Label'].iloc[i:i + window_size].values.tolist()         
+         ]
+        for i in range(0, len(raw_data), step_size)
+    ]
+    return pd.DataFrame(aggregated, columns=list(raw_data.columns)+['item_Label'])
 
 
 def sliding_window(raw_data, para):

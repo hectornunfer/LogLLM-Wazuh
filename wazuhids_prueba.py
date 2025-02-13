@@ -5,7 +5,7 @@ from pathlib import Path
 import torch
 from tqdm import tqdm
 from model import LogLLM
-from customDataset import CustomDataset
+from myCustomDataset import myCustomDataset
 import numpy as np
 import pandas as pd
 from prepareData.helper import structure_log,fixedSize_window_custom
@@ -112,10 +112,16 @@ if __name__ == '__main__':
                     preds.append('')
                     wazids.append(this_wazuh_ids)
 
-    preds_copy = np.array(preds)
-    preds = np.zeros_like(preds_copy,dtype=int)
-    preds[preds_copy == 'anomalous'] = 1
-    preds[preds_copy != 'anomalous'] = 0
-    gt = dataset.get_label()
-    for val1, val2 in zip(preds_copy, wazids):
-        print(val1, val2)
+    results = []
+
+    for deteccion, idswazuh in zip(preds, wazids):
+        results.append([idswazuh[0].strip('"') , deteccion])  # Guardamos el ID de Wazuh y la detección
+
+    # Convertir la lista en un DataFrame
+    df_results = pd.DataFrame(results, columns=['Wazuh_ID', 'Detection'])
+
+    # Guardar el DataFrame en un archivo CSV
+    results_csv_path = os.path.join(output_dir, 'detections.csv')
+    df_results.to_csv(results_csv_path, index=False)
+
+    print(f"Resultados guardados en {results_csv_path}")

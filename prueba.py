@@ -5,7 +5,7 @@ from pathlib import Path
 import torch
 from tqdm import tqdm
 from model import LogLLM
-from customDataset import CustomDataset
+from myCustomDataset import CustomDataset
 import numpy as np
 import pandas as pd
 from prepareData.helper import structure_log,fixedSize_window

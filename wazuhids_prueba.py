@@ -6,6 +6,7 @@ import torch
 from tqdm import tqdm
 from model import LogLLM
 from myCustomDataset import myCustomDataset
+from decimal import Decimal
 import numpy as np
 import pandas as pd
 from prepareData.helper import structure_log,fixedSize_window_custom
@@ -45,7 +46,7 @@ if __name__ == '__main__':
 
     structure_log(data_dir, output_dir, log_name, log_format, start_line = start_line, end_line = end_line)
 
-    df = pd.read_csv(os.path.join(output_dir,f'{log_name}_structured.csv'))
+    df = pd.read_csv(os.path.join(output_dir,f'{log_name}_structured.csv'), dtype={'WazId': str})
 
     print(len(df))
     
@@ -81,7 +82,7 @@ if __name__ == '__main__':
         file.write(f"max session length: {max_session_len}; mean session length: {mean_session_len}\n")
         file.write(f"number of anomalous sessions: {num_anomalous}; number of normal sessions: {num_normal}; number of total sessions: {len(session_df['Label'])}\n")
     
-    dataset = CustomDataset(data_path_1)
+    dataset = myCustomDataset(data_path_1)
     model = LogLLM(Bert_path, Llama_path, ft_path=ft_path, is_train_mode=False)
     model.eval()
 
@@ -115,10 +116,10 @@ if __name__ == '__main__':
     results = []
 
     for deteccion, idswazuh in zip(preds, wazids):
-        results.append([idswazuh[0].strip('"') , deteccion])  # Guardamos el ID de Wazuh y la detección
+        results.append([deteccion, idswazuh[0].replace("'","").replace(" ","")])  # Guardamos el ID de Wazuh y la detección
 
     # Convertir la lista en un DataFrame
-    df_results = pd.DataFrame(results, columns=['Wazuh_ID', 'Detection'])
+    df_results = pd.DataFrame(results, columns=['Detection', 'Wazuh_ID'])
 
     # Guardar el DataFrame en un archivo CSV
     results_csv_path = os.path.join(output_dir, 'detections.csv')

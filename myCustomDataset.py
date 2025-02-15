@@ -16,7 +16,7 @@ def replace_patterns(text):
     return re.sub(combined_pattern, '<*>', text)
 
 
-class CustomDataset(Dataset):
+class myCustomDataset(Dataset):
     def __init__(self, file_path):
         df = pd.read_csv(file_path)
         contents = df['Content'].apply(replace_patterns).values     #pre processing

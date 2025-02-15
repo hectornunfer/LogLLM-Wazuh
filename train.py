@@ -6,7 +6,7 @@ from tqdm import tqdm
 from torch import nn
 import random
 from model import LogLLM
-from customDataset import CustomDataset
+from myCustomDataset import CustomDataset
 from torch import optim
 
 

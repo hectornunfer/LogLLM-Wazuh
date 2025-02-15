@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from model import LogLLM
-from customDataset import CustomDataset
+from myCustomDataset import CustomDataset
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 max_content_len = 100

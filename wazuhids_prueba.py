@@ -33,6 +33,29 @@ end_line = None
 output_dir = data_dir
 
 if __name__ == '__main__':
+    def generate_wazuh_url(wazuh_id_str):
+        # Convertir el string de lista en una lista real        
+        # Construcción de la cadena de parámetros
+        filter_values = wazuh_id_str.replace("[","").replace("]","").replace(",","','").replace('"',"'")
+        query_values = wazuh_id_str.replace("[","").replace("]","").replace(",",",%20")
+        lista_ids = [Decimal(num) for num in wazuh_id_str.replace("[","").replace("]","").split(",")]
+
+        # Construcción de la parte 'should' separada
+        should_part = ",".join(f"(match_phrase:(id:'{v}'))" for v in lista_ids)
+
+        # Construcción del filtro principal
+        filter_param = (
+            f"filters:!(('$state':(store:appState),"
+            f"meta:(alias:!n,disabled:!f,index:'wazuh-alerts-*',key:id,negate:!f,"
+            f"params:!('{filter_values}'),type:phrases,value:'{query_values}'),"
+            f"query:(bool:(minimum_should_match:1,should:!({should_part})))))"
+            f",query:(language:kuery,query:''))&_g=(filters:!(),refreshInterval:(pause:!t,value:0),"
+            f"time:(from:now-1M,to:now))"
+        )                
+        # Construcción de la URL final
+        base_url = "https://34.175.254.53/app/threat-hunting#/overview/?tab=general&tabView=events&_a=("
+        return base_url + filter_param
+
     window_size = 100
     step_size = 100
 
@@ -120,6 +143,8 @@ if __name__ == '__main__':
 
     # Convertir la lista en un DataFrame
     df_results = pd.DataFrame(results, columns=['Detection', 'Wazuh_ID'])
+
+    df_results["Wazuh_URL"] = df_results["Wazuh_ID"].apply(generate_wazuh_url)
 
     # Guardar el DataFrame en un archivo CSV
     results_csv_path = os.path.join(output_dir, 'detections.csv')

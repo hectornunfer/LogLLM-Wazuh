@@ -10,11 +10,11 @@ El modelo original y su estudio "[LogLLM](https://github.com/guanwei49/LogLLM): 
 
 Para instalar el SIEM Wazuh en una sola instancia se seguirá el [Quickstart oficial](https://documentation.wazuh.com/current/quickstart.html)
 
-'''
+```bash
 curl -sO https://packages.wazuh.com/4.11/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
 sed -i "s/^deb /#deb /" /etc/apt/sources.list.d/wazuh.list
 apt update
-'''
+```
 
 Acceder al dashboard de Wazuh a través de https://<WAZUH_DASHBOARD_IP_ADDRESS> y con los credenciales:
 
@@ -24,31 +24,31 @@ Password: <ADMIN_PASSWORD>
 
 Si no se recuerdan los credenciales, ejecutar:
 
-'''
+```bash
 sudo tar -O -xvf wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt
-'''
+```
 ### Agente de Wazuh
 
 Para instalar el agente en otra instancia, en el dashboard principal, en el menú de la izquierda, si se selecciona "Agents management" > "Summary" se abrirá la ventana de endpoints, en dónde se mostrarán los ya desplegados y su estado, y desde dónde se podrán desplegar nuevos agentes, en el botón "Deploy new agent"
 
 Por ejemplo, para desplegar un agente en Ubuntu 22.04 se ejecutaron los siguientes comandos, indicando la IP del manager de Wazuh:
 
-'''
+```bash
 wget https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent\_4.10.1-1\_amd64.deb && sudo WAZUH\_MANAGER='X.X.X.X' dpkg -i ./wazuh-agent\_4.10.1-1\_amd64.deb
 sudo systemctl daemon-reload
 sudo systemctl enable wazuh-agent
 sudo systemctl start wazuh-agent
-'''
+```
 
 ## Descarga y envío de logs.
 
 Para descargar los logs de Thunderbird y enviarlos a Wazuh como si los generase el agente, se ejecutará:
 
-'''
+```bash
 sudo wget -O Thunderbird.tar.gz https://zenodo.org/records/8196385/files/Thunderbird.tar.gz?download=1
 tar -xzvf Thunderbird.tar.gz
 sudo python3 enviar_logs.py
-'''
+```
 
 Este script lo que hace es cargar línea a línea los logs en un fichero monitorizado por el agente. Para ver los logs en Wazuh se debe crear un decoder y una regla presonalizados.
 
@@ -56,17 +56,17 @@ Este script lo que hace es cargar línea a línea los logs en un fichero monitor
 
 Para obtener los eventos de Wazuh en las últimas 24 horas con su ID y el log de Thunderbird, se ejecuta:
 
-'''
+```bash
 sudo python3 recoger_eventos.py
-'''
+```
 
 ## Analizar eventos
 
 Una vez descargados los eventos de Wazuh, se puede ejecutar el modelo para analizarlos. Ejecutando este script, se generará un resultado indicando para cada subconjunto de logs si se ha detectado una anomalía en ellos o no, una lista de los IDs de los eventos analizados y una URL que lleva a la búsqueda directa de estos mismos.
 
-'''
+```bash
 sudo python3 analizar_eventos_wazuh.py
-'''
+```
 
 Un ejemplo con los resultados es detections.csv, estos se enviarán a Wazuh mediante el monitoreo de un archivo. Con la creación de decoders y reglas se podrán ver los resultados en el dashboard de Wazuh.
 

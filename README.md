@@ -1,40 +1,86 @@
-# LogLLM: Log-based Anomaly Detection Using Large Language Models #
+# LogLLM-Wazuh: Log-based Anomaly Detection On Wazuh Using Large Language Models #
 
-Official Implementation of "LogLLM: Log-based Anomaly Detection Using Large Language Models"
+La arquitectura de la solución es la siguiente.
+![Arquitectura.png](Arquitectura.png)
+
+El modelo original y su estudio "[LogLLM](https://github.com/guanwei49/LogLLM): Log-based Anomaly Detection Using Large Language Models" tienen la siguiente estructura.
 ![framework.png](framework.png)
 
-## Datasets
+## Install Wazuh
 
-The statistics of datasets used in the experiments.
+Para instalar el SIEM Wazuh en una sola instancia se seguirá el [Quickstart oficial](https://documentation.wazuh.com/current/quickstart.html)
 
-|             |                    |                     |    Training Data    |  Training Data  |   Training Data   |    Testing Data     |  Testing Data   |   Testing Data    |
-|:-----------:|:------------------:|:-------------------:|:-------------------:|:---------------:|:-----------------:|:-------------------:|:---------------:|:-----------------:|
-|             | **# Log Messages** | **# Log Sequences** | **# Log Sequences** | **# Anomalies** | **Anomaly Ratio** | **# Log Sequences** | **# Anomalies** | **Anomaly Ratio** |
-|    HDFS     |     11,175,629     |       575,061       |       460,048       |      13497      |       2.93%       |       115013        |      3341       |       2.90%       |
-|     BGL     |     4,747,963      |       47,135        |       37,708        |      4009       |      10.63%       |        9427         |       817       |       8.67%       |
-|   Liberty   |     5,000,000      |       50,000        |        40000        |      34144      |      85.36%       |        10000        |       651       |       6.51%       |
-| Thunderbird |     10,000,000     |       99,997        |       79,997        |       837       |       1.05%       |        20000        |       29        |       0.15%       |
+'''bash
+curl -sO https://packages.wazuh.com/4.11/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
+sed -i "s/^deb /#deb /" /etc/apt/sources.list.d/wazuh.list
+apt update
+'''
 
-## Experiment Results
+Acceder al dashboard de Wazuh a través de https://<WAZUH_DASHBOARD_IP_ADDRESS> y con los credenciales:
 
-Experimental Results on HDFS, BGL, Liberty, and Thunderbird datasets. The best results are indicated using bold
-typeface.
+Username: admin
 
-|            |                |   HDFS    |   HDFS    |   HDFS    |    BGL    |    BGL    |    BGL    |  Liberty  |  Liberty  |  Liberty  | Thunderbird | Thunderbird | Thunderbird |             |
-|:----------:|:--------------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-----------:|:-----------:|:-----------:|:-----------:|
-|            | **Log Parser** | **Prec.** | **Rec.**  |  **F1**   | **Prec.** | **Rec.**  |  **F1**   | **Prec.** | **Rec.**  |  **F1**   |  **Prec.**  |  **Rec.**   |   **F1**    | **Avg. F1** |
-|  DeepLog   |    &#10004;    |   0.835   |   0.994   |   0.908   |   0.166   |   0.988   |   0.285   |   0.132   |   0.931   |   0.232   |    0.017    |    0.963    |    0.033    |    0.365    |
-| LogAnomaly |    &#10004;    |   0.886   |   0.893   |   0.966   |   0.176   |   0.985   |   0.299   |   0.141   |   0.924   |   0.245   |    0.025    |    0.963    |    0.050    |    0.390    |
-|   PLELog   |    &#10004;    |   0.893   |   0.979   |   0.934   |   0.595   |   0.880   |   0.710   |   0.795   |   0.874   |   0.832   |    0.826    |    0.704    |    0.760    |    0.809    |
-| FastLogAD  |    &#10004;    |   0.721   |   0.893   |   0.798   |   0.167   | **1.000** |   0.287   |   0.151   | **0.999** |   0.263   |    0.008    |    0.931    |    0.017    |    0.341    |
-|  LogBERT   |    &#10004;    |   0.989   |   0.614   |   0.758   |   0.165   |   0.989   |   0.283   |   0.183   |   0.861   |   0.301   |    0.143    |    0.500    |    0.222    |    0.391    |
-| LogRobust  |    &#10004;    |   0.961   |   1.000   |   0.980   |   0.696   |   0.968   |   0.810   |   0.695   |   0.979   |   0.813   |    0.318    |  **1.000**  |    0.482    |    0.771    |
-|    CNN     |    &#10004;    |   0.966   |   1.000   |   0.982   |   0.698   |   0.965   |   0.810   |   0.580   |   0.914   |   0.709   |    0.900    |    0.670    |    0.766    |    0.817    |
-| NeuralLog  |    &#10008;    |   0.971   |   0.988   |   0.979   |   0.792   |   0.884   |   0.835   |   0.875   |   0.926   |   0.900   |    0.794    |    0.931    |    0.857    |    0.893    |
-|   RAPID    |    &#10008;    | **1.000** |   0.859   |   0.924   | **0.874** |   0.399   |   0.548   |   0.911   |   0.611   |   0.732   |    0.200    |    0.207    |    0.203    |    0.602    |
-|   LogLLM   |    &#10008;    |   0.994   | **1.000** | **0.997** |   0.861   |   0.979   | **0.916** | **0.992** |   0.926   | **0.958** |  **0.966**  |    0.966    |  **0.966**  |  **0.959**  |
+Password: <ADMIN_PASSWORD>
 
-## Using Our Code to Reproduce the Results
+Si no se recuerdan los credenciales, ejecutar:
+
+'''bash
+sudo tar -O -xvf wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt
+'''
+### Agente de Wazuh
+
+Para instalar el agente en otra instancia, en el dashboard principal, en el menú de la izquierda, si se selecciona "Agents management" > "Summary" se abrirá la ventana de endpoints, en dónde se mostrarán los ya desplegados y su estado, y desde dónde se podrán desplegar nuevos agentes, en el botón "Deploy new agent"
+
+Por ejemplo, para desplegar un agente en Ubuntu 22.04 se ejecutaron los siguientes comandos, indicando la IP del manager de Wazuh:
+
+'''bash
+wget https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent\_4.10.1-1\_amd64.deb && sudo WAZUH\_MANAGER='X.X.X.X' dpkg -i ./wazuh-agent\_4.10.1-1\_amd64.deb
+sudo systemctl daemon-reload
+sudo systemctl enable wazuh-agent
+sudo systemctl start wazuh-agent
+'''
+
+## Descarga y envío de logs.
+
+Para descargar los logs de Thunderbird y enviarlos a Wazuh como si los generase el agente, se ejecutará:
+
+'''bash
+sudo wget -O Thunderbird.tar.gz https://zenodo.org/records/8196385/files/Thunderbird.tar.gz?download=1
+tar -xzvf Thunderbird.tar.gz
+sudo python3 enviar_logs.py
+'''
+
+Este script lo que hace es cargar línea a línea los logs en un fichero monitorizado por el agente. Para ver los logs en Wazuh se debe crear un decoder y una regla presonalizados.
+
+## Obtener eventos de Wazuh para ser analizados.
+
+Para obtener los eventos de Wazuh en las últimas 24 horas con su ID y el log de Thunderbird, se ejecuta:
+
+'''bash
+sudo python3 recoger_eventos.py
+'''
+
+## Analizar eventos
+
+Una vez descargados los eventos de Wazuh, se puede ejecutar el modelo para analizarlos. Ejecutando este script, se generará un resultado indicando para cada subconjunto de logs si se ha detectado una anomalía en ellos o no, una lista de los IDs de los eventos analizados y una URL que lleva a la búsqueda directa de estos mismos.
+
+'''bash
+sudo python3 analizar_eventos_wazuh.py
+'''
+
+Un ejemplo con los resultados es detections.csv, estos se enviarán a Wazuh mediante el monitoreo de un archivo. Con la creación de decoders y reglas se podrán ver los resultados en el dashboard de Wazuh.
+
+## Ajuste de parámetros
+
+Para simular el ajuste de parámetros explicado en la memoria se emplean los archivos estudio_batch.py para estudiar el batch_size óptimo y estudio_windowstep.py para estudiar los parámetros window_size y step_size óptimos.
+
+## Google Colab
+
+Para ejecutar el modelo Google Colab es una buena opción ya que ofrece recursos computacionales de forma gratuíta.
+
+## Probar el funcionamiento del modelo
+
+Estos son los pasos que se ofrecen en el modelo original para probar su correcto funcionamiento y calcular las métricas.aaa
 
 1. Create conda environment.
 
@@ -126,5 +172,4 @@ typeface.
    dataset_name = # i.e., 'BGL'
    data_path =  # i.e., r'/mnt/public/gw/SyslogData/{dataset_name}/test.csv'.format(dataset_name)
    ```
-- We have provided the test file for the BGL dataset, which can be accessed at [here](https://drive.google.com/file/d/1aMKzhrLklnk5RX78UBc3Zx3voIIGnQzo/view?usp=sharing).
 - Run ```python eval.py``` from the root directory. 

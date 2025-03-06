@@ -1,12 +1,14 @@
 # LogLLM-Wazuh: Log-based Anomaly Detection On Wazuh Using Large Language Models #
 
 La arquitectura de la solución es la siguiente.
+
 ![Arquitectura.png](Arquitectura.png)
 
 El modelo original y su estudio "[LogLLM](https://github.com/guanwei49/LogLLM): Log-based Anomaly Detection Using Large Language Models" tienen la siguiente estructura.
+
 ![framework.png](framework.png)
 
-## Install Wazuh
+## Instalar Wazuh
 
 Para instalar el SIEM Wazuh en una sola instancia se seguirá el [Quickstart oficial](https://documentation.wazuh.com/current/quickstart.html)
 
@@ -27,7 +29,7 @@ Si no se recuerdan los credenciales, ejecutar:
 ```bash
 sudo tar -O -xvf wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt
 ```
-### Agente de Wazuh
+### Instalar agente de Wazuh
 
 Para instalar el agente en otra instancia, en el dashboard principal, en el menú de la izquierda, si se selecciona "Agents management" > "Summary" se abrirá la ventana de endpoints, en dónde se mostrarán los ya desplegados y su estado, y desde dónde se podrán desplegar nuevos agentes, en el botón "Deploy new agent"
 
@@ -59,12 +61,14 @@ Para obtener los eventos de Wazuh en las últimas 24 horas con su ID y el log de
 ```bash
 sudo python3 recoger_eventos.py
 ```
+Se puede observar el resultado en el fichero de prueba "thunderbird_prueba.log" en la carpeta THunderbird, que son los logs con los IDs de Wazuh correspondientes a su evento que se han utilizado en las pruebas de la memoria.
 
 ## Analizar eventos
 
 Una vez descargados los eventos de Wazuh, se puede ejecutar el modelo para analizarlos. Ejecutando este script, se generará un resultado indicando para cada subconjunto de logs si se ha detectado una anomalía en ellos o no, una lista de los IDs de los eventos analizados y una URL que lleva a la búsqueda directa de estos mismos.
 
 ```bash
+sudo pip install -r requirements.txt
 sudo python3 analizar_eventos_wazuh.py
 ```
 
@@ -80,7 +84,7 @@ Para ejecutar el modelo Google Colab es una buena opción ya que ofrece recursos
 
 ## Probar el funcionamiento del modelo
 
-Estos son los pasos que se ofrecen en el modelo original para probar su correcto funcionamiento y calcular las métricas.aaa
+Estos son los pasos que se ofrecen en el modelo original para probar su correcto funcionamiento y calcular las métricas.
 
 1. Create conda environment.
 
